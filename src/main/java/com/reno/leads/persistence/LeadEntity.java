@@ -8,7 +8,7 @@ import java.time.Instant;
 public class LeadEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "service_id", nullable = false) private Integer serviceId;
+    @Column(name = "service_id", nullable = false) private Long serviceId;
     @Column(nullable = false) private String name;
     @Column(nullable = false) private String email;
     @Column(name = "mobile_number", nullable = false) private String mobileNumber;
@@ -23,8 +23,8 @@ public class LeadEntity {
     @PreUpdate void onUpdate() { updatedAt = Instant.now(); }
 
     public Long getId() { return id; }
-    public Integer getServiceId() { return serviceId; }
-    public void setServiceId(Integer serviceId) { this.serviceId = serviceId; }
+    public Long getServiceId() { return serviceId; }
+    public void setServiceId(Long serviceId) { this.serviceId = serviceId; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getEmail() { return email; }
@@ -36,5 +36,4 @@ public class LeadEntity {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public String getStatus() { return status; }
-    public String getCreatedAtString() { return createdAt == null ? null : createdAt.toString(); }
 }
