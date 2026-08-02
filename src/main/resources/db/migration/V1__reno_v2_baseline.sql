@@ -1,0 +1,3 @@
+-- Reno V2 baseline migration.
+-- Business tables must be added only after the legacy MySQL schema is mapped.
+-- Keeping this migration intentionally empty avoids inventing a schema.
