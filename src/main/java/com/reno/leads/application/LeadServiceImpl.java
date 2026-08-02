@@ -17,7 +17,7 @@ public class LeadServiceImpl implements LeadService {
     @Transactional
     public void create(LeadCreateRequest request) {
         LeadEntity entity = new LeadEntity();
-        entity.setServiceId(request.service());
+        entity.setServiceId(request.service().longValue());
         entity.setName(request.name());
         entity.setEmail(request.email());
         entity.setMobileNumber(request.mobileNumber());
@@ -26,6 +26,7 @@ public class LeadServiceImpl implements LeadService {
         repository.save(entity);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public LeadResponse get(Long id) {
         LeadEntity e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Lead not found: " + id));
