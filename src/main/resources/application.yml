@@ -1,0 +1,21 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: reno-backend
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/reno}
+    username: ${DB_USERNAME:reno}
+    password: ${DB_PASSWORD:reno}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
