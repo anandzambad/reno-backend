@@ -19,6 +19,6 @@ public class BookingController {
  public BookingController(BookingService service){this.service=service;}
  public record CreateRequest(@NotNull @Positive Long contractorId,@NotNull @Positive Long serviceId,@DecimalMin("-90") @DecimalMax("90") double latitude,@DecimalMin("-180") @DecimalMax("180") double longitude,@Size(max=500) String address,Instant scheduledAt,@DecimalMin("0.0") @DecimalMax("1000000.0") BigDecimal estimatedPrice){}
  public record StatusRequest(@NotNull BookingStatus status){}
- @PostMapping public ApiResponse<BookingEntity> create(@Valid @RequestBody CreateRequest r,Authentication authentication){return ApiResponse.ok(service.createForUser(CurrentUser.subject(authentication),new BookingService.CreateBooking(r.contractorId(),r.serviceId(),r.latitude(),r.longitude(),r.address(),r.scheduledAt(),r.estimatedPrice())));}
+ @PostMapping public ApiResponse<BookingEntity> create(@Valid @RequestBody CreateRequest r,Authentication authentication){return ApiResponse.ok(service.createForUser(CurrentUser.customerId(authentication),new BookingService.CreateBooking(null,r.contractorId(),r.serviceId(),r.latitude(),r.longitude(),r.address(),r.scheduledAt(),r.estimatedPrice())));}
  @PatchMapping("/{id}/status") public ApiResponse<BookingEntity> status(@PathVariable @Positive long id,@Valid @RequestBody StatusRequest r,Authentication authentication){return ApiResponse.ok(service.updateStatusForUser(id,r.status(),CurrentUser.subject(authentication),CurrentUser.role(authentication)));}
 }
