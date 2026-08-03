@@ -3,16 +3,19 @@ package com.reno.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Configuration
 @EnableMethodSecurity
@@ -24,7 +27,10 @@ public class SecurityConfig {
    .oauth2ResourceServer(o->o.jwt(j->j.jwtAuthenticationConverter(jwtAuthenticationConverter())));
   return http.build();
  }
- @Bean JwtAuthenticationConverter jwtAuthenticationConverter(){ return new JwtAuthenticationConverter(); }
+ @Bean Converter<Jwt,? extends AbstractAuthenticationToken> jwtAuthenticationConverter(){
+  JwtGrantedAuthoritiesConverter scopes=new JwtGrantedAuthoritiesConverter();
+  return jwt->{Set<String> roles=new HashSet<>(); Object claim=jwt.getClaims().get("roles"); if(claim instanceof Collection<?> c)c.forEach(v->roles.add("ROLE_"+String.valueOf(v).replaceFirst("^ROLE_",""))); else if(claim instanceof String s)Arrays.stream(s.split("[, ]+")).filter(v->!v.isBlank()).forEach(v->roles.add("ROLE_"+v.replaceFirst("^ROLE_",""))); var authorities=new ArrayList<>(scopes.convert(jwt)); authorities.addAll(roles.stream().map(org.springframework.security.core.authority.SimpleGrantedAuthority::new).toList()); return new JwtAuthenticationToken(jwt,authorities,jwt.getSubject());};
+ }
  @Bean CorsConfigurationSource corsConfigurationSource(){
   CorsConfiguration c=new CorsConfiguration(); c.setAllowedOrigins(Arrays.stream(allowedOrigins.split(",")).map(String::trim).filter(s->!s.isBlank()).toList()); c.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS")); c.setAllowedHeaders(List.of("Authorization","Content-Type","Idempotency-Key","X-Request-Id")); c.setExposedHeaders(List.of("X-Request-Id")); c.setAllowCredentials(true); c.setMaxAge(3600L);
   UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource(); source.registerCorsConfiguration("/**",c); return source;
